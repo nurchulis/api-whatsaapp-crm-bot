@@ -1,0 +1,64 @@
+
+db.log_chats.find({"time": {$gte: ISODate("2020-02-13T00:00:00Z"), $lt: ISODate("2020-02-13T23:59:59Z")},"fromMe":"false"}).count();
+//Find data logs Current Date
+
+
+
+db.log_chats.aggregate([{ $group: {_id: {name: "$name", month: {$month: "$time"}},count: { $sum: 1}}},{$group: {_id: "$_id.name",patient: {$push: {month: "$_id.month", count: "$count"}}}}])
+
+
+db.log_chats.aggregate([{$match: {from:false}}, {$group: { _id : {time:{$year:"$spotReceivedTimestamp"}, time:{$month:"$spotReceivedTimestamp"}, time:{$dayOfMonth:"$spotReceivedTimestamp"}},count:{$sum: 1 }}}])
+
+db.log_chats.aggregate([{$group: {_id: { month: { $month: "$time" }, year: { $year: "$time" } }, total: {$sum: 1}}}]);
+
+
+db.log_chats.aggregate( {$group : { month : {$month : "$time"},year : {$year :  "$time"}}}, {$group : { _id : {month : "$month" ,year : "$year" },  total : {$sum : 1}}})
+
+db.log_chats.aggregate({$group : {_id : {month : {$month : "$time"},year : {$year :  "$time"}}},total:{$sum :1}})
+
+db.log_chats.aggregate([{ "$group": { "_id": { "year": {$year : "$time"}, "month": {$month : "$time"} }, "count": { "$sum": 1 } }} ])
+
+
+ db.log_chats.aggregate([{"$project": {"nominal": 1, "month": { $month: "$time" }}},{ "$group": {"_id": "$month", "total": { "$sum": "$nominal" }}}])
+
+ db.log_chats.aggregate([{"$group": {"_id": {"$month": "$time"},"count": {"$sum": 1}}}])
+
+
+
+ db.log_chats.aggregate({"$project": {"y":{"$year":"$time"},"m":{"$month":"$time"},"d":{"$dayOfMonth":"$time"},"h":{"$hour":"$time"},"tweet":1 }},{"$group":{"_id": { "year":"$y","month":"$m","day":"$d","hour":"$h"},"total":{ "$sum": 1}}})
+
+
+ db.log_chats.aggregate([{"$group":{_id:"$user_type", count:{"$sum":1}}}])
+
+
+db.chats.aggregate({$match: {time: {$lt: new ISODate()}}}, {$group: {_id: null,oldestDate: {$min: "$time"},sumReports: {$sum: "$reports"}}}, {$project: {_id: 0,avgReports: {$divide: ["$sumReports", {$divide: [{$subtract: [new ISODate(), "$oldestDate"]}, 1000 * 60 * 60 * 24]}]}}})
+
+
+db.log_chats.aggregate({ "$project": {"y":{"$year":"$time"},"m":{"$month":"$time"},"d":{"$dayOfMonth":"$time"},"h":{"$hour":"$time"},"tweet":1 }},{"$group":{"_id": { "year":"$y","month":"$m","day":"$d","hour":"$h"},"total":{ "$sum": 1}}})
+
+db.log_chats.aggregate({ "$project": {"h":{"$hour":"$time"},"tweet":1 }},{"$group":{"_id": { "hour":"$h"},"total":{ "$sum": 1}}})
+
+
+db.dialogs.insert({"author":"6283863930860@c.us","type":"follow","time":2020-02-15T13:05:41.353+00:00,"chatId":"6283863930860@c.us"})
+
+db.dialogs.insert({"author":"6283863930860@c.us","type":"follow","time":"2020-02-15T13:05:41.353+00:00","chatId":"6283863930860@c.us","log_chat":[{"status":"solved","total":1}]})
+
+db.dialogs.update({"_id":ObjectId("5e47eca56a057105b9d5f16a")},{$set:{"log_chat":[{"status":"solved","total":1},{"status":"solved","total":2}]}})
+
+
+db.dialogs.update({"log_chat.status":"solved"},{"$set":{"log_chat.$[elem].total":2}},{"arrayFilters":[{"elem.status":"solved"}],"multi":true})
+
+db.dialogs.update({"_id":ObjectId("5e47eca56a057105b9d5f16a"),"log_chat.status":"solved"},{"$inc":{"log_chat.$[elem].total":1}},{"arrayFilters":[{"elem.status":"solved"}],"multi":true})
+
+db.dialogs.update({"_id":ObjectId("5e47eca56a057105b9d5f16a"),"log_chat.status":"solved"},{"$inc": { "log_chat.total": 1 }},{"arrayFilters":[{"elem.status":"solved"}],"multi":true})
+
+
+"$inc": { "metrics.orders": 1 }
+
+ action=mongo.db.dialogs.update({"_id":ObjectId("5e47eca56a057105b9d5f16a"),"log_chat.status":"solved"},
+ {{
+ "$inc":{"log_chat.$[elem].total":1}
+ },
+ {"arrayFilters":[{"elem.status":"solved"}]}
+ }
+ ,upsert=True)

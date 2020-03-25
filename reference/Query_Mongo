@@ -1,0 +1,72 @@
+**Auth**
+
+
+//Login User
+db.users.find({"email":"nura3609@gmail.com","passwords":"latifahlina"})
+
+//User Regitser
+db.users.insert({"username":"nurchulis","email:nura3609@gmail.com","passwords":"latifahlina"})
+
+//User Update Profile
+db.users.insert({"username":"nurchulis","passwords":"latifahlina","email":"nura3609@gmail.com",data:{"alamat":"bantul","kode_pos":"55171","ttl":"Bantul 1998"},"minat_property":["rumah","tanah","apartemen"],"verified":false})
+
+db.users.update({_id:ObjectId("5cb54185cdb6c52a42a87ce6")},{$set:{"username":"lina","passwords":"latifahlina","email":"nura3609@gmail.com",data:{"alamat":"bantul","kode_pos":"55171","ttl":"Bantul 1998"},"nohp":["083863930860","02434354624"],"minat_property":["rumah","tanah","apartemen"],"verified":false}})
+
+
+db.users.insert({"username":"lina","password":"latifahlina","email":"nura3609@gmail.com","data":{"alamat":"bantul","kode_pos":"55171","ttl":"Bantul 1998"},"minat_property":["rumah","tanah","apartemen"],"verified":false,"nohp":{"083863930860":"verifed","02434354624":"unverif"})
+
+
+**Advertisment**
+
+//Insert Advert
+ db.advert.insertOne({title:"Rumah Dijual",harga:20000000,nego:true,luas:{luas_bangunan:200},sertifikasi:true,fasilitas:["Kamar mandi","Kamar Tidur"],kategori:"apartemen",tersedia:1})
+ db.advert.insertOne({title:"Rumah Dijual",harga:20000000,nego:true,luas:{luas_bangunan:200},sertifikasi:true,fasilitas:["Kamar mandi","Kamar Tidur"],kategori:"apartemen",tersedia:1,foto:["gambar1.jpg","gambar2.jpg","gambar3.jpg"]})
+
+
+//Update Advert
+db.advert.updateOne({_id:ObjectId("5caeb3c6236c7158c1593752")}, {$set:{"title":"Tanah Dijual","fasilitas.0":"Kamar Mandi","luas.luas_tanah":1400}, $currentDate:{lastModified:true}})
+
+	Response
+		{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+
+//Get Advert
+
+
+db.advert.aggregate([{$group:{_id:"$kategori", count:{$sum:1}}}] )
+
+
+
+//Search Advert
+db.advert.find({$text:{$search:"Dijual"}},{score:{$meta:"textScore"}}).sort({score:{$meta:"textScore"}})
+
+	Response:
+		{ "_id" : ObjectId("5caf25b6e402bf4f6128b201"), "title" : "Rumah Dijual", "harga" : 20000000, "nego" : true, "luas" : { "luas_bangunan" : 200 }, "sertifikasi" : true, "fasilitas" : [ "Kamar mandi", "Kamar Tidur" ], "kategori" : "apartemen", "tersedia" : 1, "score" : 0.75 }
+		{ "_id" : ObjectId("5caf3029e402bf4f6128b202"), "title" : "Rumah Dijual", "harga" : 20000000, "nego" : true, "luas" : { "luas_bangunan" : 200 }, "sertifikasi" : true, "fasilitas" : [ "Kamar mandi", "Kamar Tidur" ], "kategori" : "apartemen", "tersedia" : 1, "score" : 0.75 }
+
+
+
+
+
+
+
+
+//Aggregate
+db.advert.aggregate([{$match:{nego:true}}, {$group:{_id:"$kategori",total:{$sum:"$harga"} }} ])
+{ "_id" : "rumah", "total" : 30000000 }
+{ "_id" : "apartemen", "total" : 80000000 }
+
+
+
+
+
+
+
+//Refrensi
+https://www.bogotobogo.com/python/MongoDB_PyMongo/python_MongoDB_RESTAPI_with_Flask.php
+http://api.mongodb.com/python/current/tutorial.html
+https://medium.com/@riken.mehta/full-stack-tutorial-flask-react-docker-ee316a46e876
+https://stackoverflow.com/questions/45179360/setting-up-a-password-identification-in-flask-restful-to-work-with-mongodb
+
+
+//Connect
+https://docs.mongodb.com/guides/server/drivers/
